@@ -1,16 +1,16 @@
 package com.example.api.exception;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
-public class BusinessException extends RuntimeException{
-	private final String hash;
-	private final String idContainer;
+public class BusinessException extends RuntimeException {
 
-	public BusinessException(String message, String hash, String idContainer){
-		super(message);
-		this.hash = hash;
-		this.idContainer = idContainer;
-	}
+    private final HttpStatus httpStatus;
+
+    public BusinessException(String message, HttpStatus httpStatus) {
+        super(message);
+        this.httpStatus = httpStatus;
+    }
 
 }

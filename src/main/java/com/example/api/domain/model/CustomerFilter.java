@@ -1,4 +1,4 @@
-package com.example.api.domain;
+package com.example.api.domain.model;
 
 
 import lombok.Builder;
@@ -17,4 +17,7 @@ public class CustomerFilter {
     @Email(message = "Please provide a valid email address")
     private String email;
     private String gender;
+    private String state;
+    private String city;
+    private Long id;
 }
