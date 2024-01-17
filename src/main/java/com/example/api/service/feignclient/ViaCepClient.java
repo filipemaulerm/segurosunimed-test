@@ -1,4 +1,4 @@
-package com.example.api.client;
+package com.example.api.service.feignclient;
 
 import com.example.api.domain.model.ViaCepResponse;
 import org.springframework.cloud.openfeign.FeignClient;
