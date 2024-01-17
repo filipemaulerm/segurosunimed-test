@@ -6,6 +6,9 @@ import com.example.api.domain.model.ViaCepResponse;
 import com.example.api.exception.BusinessException;
 import com.example.api.repository.AddressRepository;
 import com.example.api.service.feignclient.ViaCepClient;
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,10 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -75,27 +77,35 @@ class AddressServiceTest {
 
     @Test
     void testGetAddressByZipCodeClientError() {
-        // Mock a client-side error from the external service
-        when(viaCepClient.getAddressByZipCode(anyString())).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Client Error"));
-
-        // Test the method with a client-side error
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> addressService.getAddressByZipCode("12345678"));
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
-    }
-
-    @Test
-    void testGetAddressByZipCodeServerError() {
         // Mock a server-side error from the external service
-        when(viaCepClient.getAddressByZipCode(anyString())).thenThrow(
-                new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Error"));
+        Request request = Request.create(Request.HttpMethod.GET, "url",
+                new HashMap<>(), null, new RequestTemplate());
+        when(viaCepClient.getAddressByZipCode(anyString()))
+                .thenThrow(
+                        new FeignException.FeignClientException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                "Server Error", request, null));
 
         // Test the method with a server-side error
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> addressService.getAddressByZipCode("12345678"));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getHttpStatus());
+    }
+
+    @Test
+    void testGetAddressByZipCodeServerError() {
+        // Mock a server-side error from the external service
+        Request request = Request.create(Request.HttpMethod.GET, "url",
+                new HashMap<>(), null, new RequestTemplate());
+        when(viaCepClient.getAddressByZipCode(anyString()))
+                .thenThrow(new FeignException.FeignClientException
+                        .NotFound("Cep not found", request, null));
+
+        // Test the method with a server-side error
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> addressService.getAddressByZipCode("12345678"));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
     }
 
     @Test
