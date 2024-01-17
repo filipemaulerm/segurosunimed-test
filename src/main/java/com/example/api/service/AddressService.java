@@ -1,10 +1,10 @@
 package com.example.api.service;
 
-import com.example.api.service.feignclient.ViaCepClient;
 import com.example.api.domain.model.AddressDto;
 import com.example.api.domain.model.ViaCepResponse;
 import com.example.api.exception.BusinessException;
 import com.example.api.repository.AddressRepository;
+import com.example.api.service.feignclient.ViaCepClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -54,6 +54,12 @@ public class AddressService {
         }
     }
 
+    /**
+     * Retrieves all addresses with pagination, ordered by city in ascending order.
+     *
+     * @param pageable Pageable object specifying the page size, page number, and sorting information.
+     * @return Page containing a list of addresses.
+     */
     public Page<AddressDto> findAll(Pageable pageable) {
         return this.addressRepository.findAllByOrderByCityAsc(pageable)
                 .map(a -> AddressDto.builder()

@@ -20,9 +20,16 @@ public class AddressController {
 
     private final AddressService service;
 
+    /**
+     * Retrieves all addresses with pagination.
+     *
+     * @param pageable Pageable object specifying the page size, page number, and sorting information.
+     * @return Page containing a list of addresses.
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<AddressDto> findAll(Pageable pageable) {
+        log.info("Fetching all addresses with pagination.");
         return service.findAll(pageable);
     }
 }
